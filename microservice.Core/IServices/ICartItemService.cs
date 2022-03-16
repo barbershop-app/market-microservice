@@ -11,8 +11,8 @@ namespace microservice.Core.IServices
     {
         IEnumerable<CartItem> GetAllAsQueryable();
         CartItem GetById(Guid id);
-        public bool Edit(CartItem oldRoutine, int quantity);
-        public bool Delete(CartItem routine);
-        public bool Create(CartItem routine);
+        public bool Edit(CartItem cartItem, int quantity);
+        public bool Delete(CartItem cartItem);
+        public bool Create(CartItem cartItem);
     }
 }

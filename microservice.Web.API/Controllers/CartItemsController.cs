@@ -32,7 +32,7 @@ namespace microservice.Web.API.Controllers
             if (cartItems != null)
                 return Ok(cartItems);
             else
-                return BadRequest("Empty carts");
+                return BadRequest("Empty carts.");
         }
 
         [HttpGet]
@@ -43,7 +43,7 @@ namespace microservice.Web.API.Controllers
             if (cartItem != null)
                 return Ok(cartItem);
             else
-                return BadRequest("cart not found");
+                return BadRequest("Cart not found.");
         }
 
         [HttpPost]
@@ -63,13 +63,52 @@ namespace microservice.Web.API.Controllers
                     }
                 }
                 if (res)
+                {
+                    var cartItem = _mapper.Map<CartItem>(dto);
+
+                    _cartItemService.Create(cartItem);
                     return Ok("CartItem has been added.");
+                }
 
                 return BadRequest("Failed to create a new cartItem.");
             }
             catch (Exception)
             {
                 return BadRequest("Failed to create a new cartItem.");
+            }
+
+        }
+
+        [HttpPost]
+        [Route("UpdateCartItem")]
+        public IActionResult UpdateCartItem([FromBody] CartItemDTOs.Update dto)
+        {
+            try
+            {
+                bool res = false;
+                var cartItems = _cartItemService.GetAllAsQueryable();
+                foreach (CartItem cartItem in cartItems)
+                {
+                    if (cartItem.Product.Id == dto.ProductId)
+                    {
+                        res = true;
+                        break;
+                    }
+                }
+                if (res)
+                {
+                    var cartItem = _mapper.Map<CartItem>(dto);
+                    _cartItemService.Edit(cartItem, dto.Quantity);
+                    return Ok("CartItem has been updated.");
+                }    
+
+
+
+                return BadRequest("Failed to update the cartItem.");
+            }
+            catch (Exception)
+            {
+                return BadRequest("Failed to update the cartItem.");
             }
 
         }

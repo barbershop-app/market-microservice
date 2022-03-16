@@ -11,8 +11,8 @@ namespace microservice.Core.IServices
     {
         IEnumerable<Product> GetAllAsQueryable();
         Product GetById(Guid id);
-        public bool Edit(Product oldRoutine, Product newRoutine);
-        public bool Delete(Product routine);
-        public bool Create(Product routine);
+        public bool Edit(Product oldProduct, Product newProduct);
+        public bool Delete(Product product);
+        public bool Create(Product product);
     }
 }

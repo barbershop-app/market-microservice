@@ -1,4 +1,5 @@
-﻿using microservice.Core.IServices;
+﻿using microservice.Core;
+using microservice.Core.IServices;
 using microservice.Infrastructure.Entities.DB;
 using System;
 using System.Collections.Generic;
@@ -10,28 +11,38 @@ namespace microservice.Data.Access.Services
 {
     public class CartItemService : ICartItemService
     {
-        public CartItem GetById(Guid id)
+        private readonly IUnitOfWork _unitOfWork;
+        public CartItemService(IUnitOfWork unitOfWork)
         {
-            throw new NotImplementedException();
+            _unitOfWork = unitOfWork;
+        }
+        public CartItem GetById(Guid Id)
+        {
+            return _unitOfWork.CartItems.GetById(Id);
         }
         public IEnumerable<CartItem> GetAllAsQueryable()
         {
-            throw new NotImplementedException();
+            return _unitOfWork.CartItems.GetAllAsQueryable();
         }
 
-        public bool Create(CartItem routine)
+        public bool Create(CartItem cartItem)
         {
-            throw new NotImplementedException();
+            _unitOfWork.CartItems.Add(cartItem);
+            return _unitOfWork.Commit() > 0;
         }
 
-        public bool Delete(CartItem routine)
+        public bool Delete(CartItem cartItem)
         {
-            throw new NotImplementedException();
+            _unitOfWork.CartItems.Remove(cartItem);
+            return _unitOfWork.Commit() > 0;
         }
 
-        public bool Edit(CartItem oldRoutine, CartItem newRoutine)
+        public bool Edit(CartItem cartItem, int quantity)
         {
-            throw new NotImplementedException();
+            cartItem.Quantity = quantity;
+
+            _unitOfWork.CartItems.Update(cartItem);
+            return _unitOfWork.Commit() > 0;
         }
 
     }

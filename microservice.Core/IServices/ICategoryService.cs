@@ -11,7 +11,7 @@ namespace microservice.Core.IServices
     {
         IEnumerable<Category> GetAllAsQueryable();
         Category GetById(Guid id);
-        public bool Edit(Category oldRoutine, Category newRoutine);
+        public bool Edit(Category oldRoutine, string name);
         public bool Delete(Category routine);
         public bool Create(Category routine);
     }

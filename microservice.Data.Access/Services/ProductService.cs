@@ -16,29 +16,39 @@ namespace microservice.Data.Access.Services
         {
             _unitOfWork = unitOfWork;
         }
-        public Product GetById(Guid id)
+        public Product GetById(Guid Id)
         {
-            throw new NotImplementedException();
+            return _unitOfWork.Products.GetByIdIncluded(Id);
         }
         public IEnumerable<Product> GetAllAsQueryable()
         {
-            throw new NotImplementedException();
+            return _unitOfWork.Products.GetAllAsQueryable();
         }
 
 
-        public bool Create(Product routine)
+        public bool Create(Product product)
         {
-            throw new NotImplementedException();
+            _unitOfWork.Products.Add(product);
+            return _unitOfWork.Commit() > 0;
         }
 
-        public bool Delete(Product routine)
+        public bool Delete(Product product)
         {
-            throw new NotImplementedException();
+            _unitOfWork.Products.Remove(product);
+            return _unitOfWork.Commit() > 0;
         }
 
-        public bool Edit(Product oldRoutine, Product newRoutine)
+        public bool Edit(Product oldProduct, Product newProduct)
         {
-            throw new NotImplementedException();
+            oldProduct.CategoryId = newProduct.CategoryId;
+            oldProduct.Name = newProduct.Name;
+            oldProduct.Price = newProduct.Price;
+            if(newProduct.ImageSource != null)
+             oldProduct.ImageSource = newProduct.ImageSource;
+
+
+            _unitOfWork.Products.Update(oldProduct);
+            return _unitOfWork.Commit() > 0;
         }
 
     }

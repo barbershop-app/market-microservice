@@ -1,4 +1,5 @@
-﻿using microservice.Core.IServices;
+﻿using microservice.Core;
+using microservice.Core.IServices;
 using microservice.Infrastructure.Entities.DB;
 using System;
 using System.Collections.Generic;
@@ -10,28 +11,39 @@ namespace microservice.Data.Access.Services
 {
     public class CategoryService : ICategoryService
     {
-        public Category GetById(Guid id)
+        private readonly IUnitOfWork _unitOfWork;
+        public CategoryService(IUnitOfWork unitOfWork)
         {
-            throw new NotImplementedException();
+            _unitOfWork = unitOfWork;
+        }
+        public Category GetById(Guid Id)
+        {
+            return _unitOfWork.Categories.GetById(Id);
         }
         public IEnumerable<Category> GetAllAsQueryable()
         {
-            throw new NotImplementedException();
+            return _unitOfWork.Categories.GetAllAsQueryable();
         }
 
-        public bool Create(Category routine)
+        public bool Create(Category category)
         {
-            throw new NotImplementedException();
+            _unitOfWork.Categories.Add(category);
+            return _unitOfWork.Commit() > 0;
+
+
         }
 
-        public bool Delete(Category routine)
+        public bool Delete(Category category)
         {
-            throw new NotImplementedException();
+            _unitOfWork.Categories.Remove(category);
+            return _unitOfWork.Commit() > 0;
         }
 
-        public bool Edit(Category oldRoutine, Category newRoutine)
+        public bool Edit(Category category, string name)
         {
-            throw new NotImplementedException();
+            category.Name = name;
+            _unitOfWork.Categories.Update(category);
+            return _unitOfWork.Commit() > 0;
         }
 
     }

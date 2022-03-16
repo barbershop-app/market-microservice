@@ -44,6 +44,5 @@ namespace microservice.Data.Access.Services
             _unitOfWork.CartItems.Update(cartItem);
             return _unitOfWork.Commit() > 0;
         }
-
     }
 }

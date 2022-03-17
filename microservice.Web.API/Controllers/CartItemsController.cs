@@ -4,6 +4,7 @@ using microservice.Infrastructure.Entities.DB;
 using microservice.Infrastructure.Entities.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Dynamic;
 
 namespace microservice.Web.API.Controllers
 {
@@ -28,22 +29,38 @@ namespace microservice.Web.API.Controllers
         [Route("GetAllCartItems")]
         public IActionResult GetAllCartItems()
         {
-            var cartItems = _cartItemService.GetAllAsQueryable().ToList();
-            if (cartItems != null)
-                return Ok(cartItems);
-            else
-                return BadRequest("Empty carts.");
+            try
+            {
+                var cartItems = _cartItemService.GetAllAsQueryable(false);
+
+                if (cartItems != null)
+                    return Ok(cartItems);
+
+                return BadRequest(new { message = "Empty carts."});
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return BadRequest(new { message = "Something went wrong." });
+            }
         }
 
         [HttpGet]
         [Route("GetCartItemById/{Id}")]
         public IActionResult GetCartItemById(Guid Id)
         {
-            var cartItem = _cartItemService.GetById(Id);
-            if (cartItem != null)
+            try
+            {
+                var cartItem = _cartItemService.GetById(Id);
                 return Ok(cartItem);
-            else
-                return BadRequest("Cart not found.");
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return BadRequest(new { message = "Something went wrong." });
+            }
         }
 
         [HttpPost]
@@ -52,29 +69,26 @@ namespace microservice.Web.API.Controllers
         {
             try
             {
-                bool res = true;
-                var cartItems = _cartItemService.GetAllAsQueryable();
-                foreach (CartItem cartItem in cartItems)
-                {
-                    if (cartItem.Product.Id == dto.ProductId)
-                    {
-                        res = false;
-                        break;
-                    }
-                }
+                var cartItem = _cartItemService.GetAllAsQueryable(false).Where(x => x.ProductId == dto.ProductId).FirstOrDefault();
+
+                if (cartItem != null)
+                    return BadRequest("A Cart item with a similiar product already exists.");
+
+                cartItem = _mapper.Map<CartItem>(dto);
+
+                var res = _cartItemService.Create(cartItem);
+
                 if (res)
-                {
-                    var cartItem = _mapper.Map<CartItem>(dto);
+                    return Ok(new { message = "CartItem has been added." });
 
-                    _cartItemService.Create(cartItem);
-                    return Ok("CartItem has been added.");
-                }
 
-                return BadRequest("Failed to create a new cartItem.");
+                return BadRequest(new { message = "Failed to create a new cartItem." });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest("Failed to create a new cartItem.");
+                _logger.LogError(ex.ToString());
+                return BadRequest(new { message = "Something went wrong." });
+
             }
 
         }
@@ -85,30 +99,24 @@ namespace microservice.Web.API.Controllers
         {
             try
             {
-                bool res = false;
-                var cartItems = _cartItemService.GetAllAsQueryable();
-                foreach (CartItem cartItem in cartItems)
-                {
-                    if (cartItem.Product.Id == dto.ProductId)
-                    {
-                        res = true;
-                        break;
-                    }
-                }
+                var oldCartItem = _cartItemService.GetById(dto.Id);
+
+                if (oldCartItem == null)
+                    return BadRequest("Cart item does not exist.");
+
+                var cartItem = _mapper.Map<CartItem>(dto);
+
+                var res = _cartItemService.Update(oldCartItem, cartItem);
+
                 if (res)
-                {
-                    var cartItem = _mapper.Map<CartItem>(dto);
-                    _cartItemService.Edit(cartItem, dto.Quantity);
-                    return Ok("CartItem has been updated.");
-                }    
-
-
-
-                return BadRequest("Failed to update the cartItem.");
+                    return Ok(new { message = "CartItem has been updated." });
+               
+                return BadRequest(new { message = "Failed to update the cartItem." });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest("Failed to update the cartItem.");
+                _logger.LogError(ex.ToString());
+                return BadRequest(new { message = "Something went wrong." });
             }
 
         }

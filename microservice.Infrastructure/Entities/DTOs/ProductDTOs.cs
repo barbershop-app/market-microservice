@@ -14,6 +14,8 @@ namespace microservice.Infrastructure.Entities.DTOs
             public string Name { get; set; }
             public double Price { get; set; }
             public bool IsAvailable { get; set; }
+            public bool OnSale { get; set; }
+            public int? OnSalePercentage { get; set; }
             public string? ImageSource { get; set; }
 
         }

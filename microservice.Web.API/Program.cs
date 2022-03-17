@@ -2,7 +2,6 @@ using microservice.Core;
 using microservice.Core.IServices;
 using microservice.Data.Access.Services;
 using microservice.Data.SQL;
-using microservice.Web.API.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -12,6 +11,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, lc) => lc
 .ReadFrom.Configuration(context.Configuration)
 );
+
+builder.Services.AddCors(options => options.AddDefaultPolicy(builder =>
+{
+    builder.AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials()
+    .SetIsOriginAllowed(origin => true);
+}));
 
 
 // Add services to the container.
@@ -51,8 +58,6 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.UseAuthentication();
-
-app.UseMiddleware<JWTMiddleware>();
 
 app.MapControllers();
 

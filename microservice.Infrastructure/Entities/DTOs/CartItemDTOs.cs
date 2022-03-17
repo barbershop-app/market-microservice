@@ -16,9 +16,10 @@ namespace microservice.Infrastructure.Entities.DTOs
         }
 
 
-        public class Update : Create
+        public class Update
         {
             public Guid Id { get; set; }
+            public int Quantity { get; set; }
         }
 
 

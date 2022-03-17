@@ -1,5 +1,6 @@
 ﻿using microservice.Core.IRepositories;
 using microservice.Infrastructure.Entities.DB;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +21,12 @@ namespace microservice.Data.SQL.Repositories
             return _context.CartItems.Where(s => s.Id == id).FirstOrDefault();
         }
 
-        public IEnumerable<CartItem> GetAllAsQueryable()
+        public IEnumerable<CartItem> GetAllAsQueryable(bool track)
         {
-            return _context.CartItems.AsQueryable();
+            if (track)
+                return _context.CartItems.AsQueryable();
+
+            return _context.CartItems.AsQueryable().AsNoTracking();
         }
     }
 }

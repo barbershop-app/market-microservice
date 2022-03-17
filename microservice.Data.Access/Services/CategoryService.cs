@@ -16,13 +16,13 @@ namespace microservice.Data.Access.Services
         {
             _unitOfWork = unitOfWork;
         }
-        public Category GetById(Guid Id)
+        public Category GetById(int id)
         {
-            return _unitOfWork.Categories.GetById(Id);
+            return _unitOfWork.Categories.GetById(id);
         }
-        public IEnumerable<Category> GetAllAsQueryable()
+        public IEnumerable<Category> GetAllAsQueryable(bool track)
         {
-            return _unitOfWork.Categories.GetAllAsQueryable();
+            return _unitOfWork.Categories.GetAllAsQueryable(track);
         }
 
         public bool Create(Category category)
@@ -32,6 +32,13 @@ namespace microservice.Data.Access.Services
 
 
         }
+        public bool Update(Category oldCategory, Category category)
+        {
+            oldCategory.Name = category.Name;
+            _unitOfWork.Categories.Update(oldCategory);
+
+            return _unitOfWork.Commit() > 0;
+        }
 
         public bool Delete(Category category)
         {
@@ -39,12 +46,6 @@ namespace microservice.Data.Access.Services
             return _unitOfWork.Commit() > 0;
         }
 
-        public bool Edit(Category category, string name)
-        {
-            category.Name = name;
-            _unitOfWork.Categories.Update(category);
-            return _unitOfWork.Commit() > 0;
-        }
 
     }
 }

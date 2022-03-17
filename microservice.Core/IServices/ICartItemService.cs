@@ -9,9 +9,9 @@ namespace microservice.Core.IServices
 {
     public interface ICartItemService
     {
-        IEnumerable<CartItem> GetAllAsQueryable();
+        IEnumerable<CartItem> GetAllAsQueryable(bool track);
         CartItem GetById(Guid id);
-        public bool Edit(CartItem cartItem, int quantity);
+        public bool Update(CartItem oldCartItem, CartItem cartItem);
         public bool Delete(CartItem cartItem);
         public bool Create(CartItem cartItem);
     }

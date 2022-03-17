@@ -9,7 +9,7 @@ namespace microservice.Core.IRepositories
 {
     public interface ICategoryRepository : IRepository<Category>
     {
-        IEnumerable<Category> GetAllAsQueryable();
-        Category GetByIdIncluded(int id);
+        public IEnumerable<Category> GetAllAsQueryable(bool track);
+        Category GetById(int id);
     }
 }

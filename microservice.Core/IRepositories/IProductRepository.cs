@@ -9,7 +9,7 @@ namespace microservice.Core.IRepositories
 {
     public interface IProductRepository : IRepository<Product>
     {
-        IEnumerable<Product> GetAllAsQueryable();
+        IEnumerable<Product> GetAllAsQueryable(bool track);
         Product GetByIdIncluded(Guid id);
     }
 }

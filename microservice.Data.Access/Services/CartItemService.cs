@@ -20,9 +20,9 @@ namespace microservice.Data.Access.Services
         {
             return _unitOfWork.CartItems.GetById(Id);
         }
-        public IEnumerable<CartItem> GetAllAsQueryable()
+        public IEnumerable<CartItem> GetAllAsQueryable(bool track)
         {
-            return _unitOfWork.CartItems.GetAllAsQueryable();
+            return _unitOfWork.CartItems.GetAllAsQueryable(track);
         }
 
         public bool Create(CartItem cartItem)
@@ -37,10 +37,9 @@ namespace microservice.Data.Access.Services
             return _unitOfWork.Commit() > 0;
         }
 
-        public bool Edit(CartItem cartItem, int quantity)
+        public bool Update(CartItem oldCartItem, CartItem cartItem)
         {
-            cartItem.Quantity = quantity;
-
+            oldCartItem.Quantity = cartItem.Quantity;
             _unitOfWork.CartItems.Update(cartItem);
             return _unitOfWork.Commit() > 0;
         }

@@ -9,10 +9,10 @@ namespace microservice.Core.IServices
 {
     public interface ICategoryService
     {
-        IEnumerable<Category> GetAllAsQueryable();
-        Category GetById(Guid id);
-        public bool Edit(Category category, string name);
+        IEnumerable<Category> GetAllAsQueryable(bool track);
+        Category GetById(int id);
         public bool Delete(Category category);
         public bool Create(Category category);
+        bool Update(Category oldCategory, Category category);
     }
 }

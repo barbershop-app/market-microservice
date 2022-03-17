@@ -8,7 +8,7 @@ namespace microservice.Infrastructure.Entities.DB
 {
     public class Category
     {
-        public int Id { get; set; } // Change to identity
+        public int Id { get; set; } 
         public string Name { get; set; }
 
     }

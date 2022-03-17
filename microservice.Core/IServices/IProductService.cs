@@ -9,9 +9,9 @@ namespace microservice.Core.IServices
 {
     public interface IProductService
     {
-        IEnumerable<Product> GetAllAsQueryable();
+        IEnumerable<Product> GetAllAsQueryable(bool track);
         Product GetById(Guid id);
-        public bool Edit(Product oldProduct, Product newProduct);
+        public bool Update(Product oldProduct, Product newProduct);
         public bool Delete(Product product);
         public bool Create(Product product);
     }

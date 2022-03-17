@@ -26,22 +26,30 @@ namespace microservice.Web.API.Controllers
         [Route("GetAllCategories")]
         public IActionResult GetAllCategories()
         {
-            var categories = _categoryService.GetAllAsQueryable().ToList();
-            if (categories != null)
+            try
+            {
+                var categories = _categoryService.GetAllAsQueryable(false);
+
                 return Ok(categories);
-            else
-                return BadRequest("Empty categories");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message.ToString());
+                return BadRequest(new { message = "Something went wrong." });
+
+            }
         }
 
         [HttpGet]
         [Route("GetCategoryById/{Id}")]
-        public IActionResult GetCategoryById(Guid Id)
+        public IActionResult GetCategoryById(int id)
         {
-            var category = _categoryService.GetById(Id);
+            var category = _categoryService.GetById(id);
+
             if (category != null)
                 return Ok(category);
-            else
-                return BadRequest("Category not found");
+
+            return BadRequest(new { message = "Category not found" });
         }
 
         [HttpPost]
@@ -50,29 +58,25 @@ namespace microservice.Web.API.Controllers
         {
             try
             {
-                bool res = true;
-                var categories = _categoryService.GetAllAsQueryable();
-                foreach (Category category in categories)
-                {
-                    if (category.Name == dto.Name)
-                    {
-                        res = false;
-                        break;
-                    }
-                }
+                var category = _categoryService.GetAllAsQueryable(false).Where(x => x.Name == dto.Name).FirstOrDefault();
+
+                if (category != null)
+                    return BadRequest("Category with a similiar name already exists.");
+
+                category = _mapper.Map<Category>(dto);
+
+                var res = _categoryService.Create(category);
+
                 if (res)
-                {
-                    var category = _mapper.Map<Category>(dto);
+                    return Ok(new { message = "Category has been added." });
 
-                    _categoryService.Create(category);
-                    return Ok("Category has been added.");
-                }
-
-                return BadRequest("Failed to create a new category.");
+                return BadRequest(new { message = "Failed to create a new category." });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest("Failed to create a new category.");
+                _logger.LogError(ex.ToString());
+                return BadRequest(new { message = "Something went wrong." });
+
             }
 
         }
@@ -83,32 +87,54 @@ namespace microservice.Web.API.Controllers
         {
             try
             {
-                bool res = false;
-                var categories = _categoryService.GetAllAsQueryable();
-                foreach (Category category in categories)
-                {
-                    if (category.Name == dto.Name)
-                    {
-                        res = true;
-                        break;
-                    }
-                }
+                var oldCategory = _categoryService.GetById(dto.Id);
+
+                if (oldCategory == null)
+                    return BadRequest("Category does not exist.");
+
+                var category = _mapper.Map<Category>(dto);
+
+                var res = _categoryService.Update(oldCategory, category);
+
                 if (res)
-                {
-                    var category = _mapper.Map<Category>(dto);
-                    _categoryService.Edit(category, dto.Name);
-                    return Ok("Category has been updated.");
-                }
+                    return Ok(new { message = "Category has been updated." });
 
 
-
-                return BadRequest("Failed to update the category.");
+                return BadRequest(new { message = "Failed to update the category." });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest("Failed to update the category.");
-            }
+                _logger.LogError(ex.ToString());
+                return BadRequest(new { message = "Something went wrong." });
 
+            }
+        }
+
+        [HttpPost]
+        [Route("DeleteCategory/{id}")]
+        public IActionResult DeleteCategory(int id)
+        {
+            try
+            {
+                var category = _categoryService.GetById(id);
+
+                if (category == null)
+                    return BadRequest("Category does not exist.");
+
+                var res = _categoryService.Delete(category);
+
+                if (res)
+                    return Ok(new { message = "Category has been deleted." });
+
+
+                return BadRequest(new { message = "Failed to deleted the category." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return BadRequest(new { message = "Something went wrong." });
+
+            }
         }
     }
 }

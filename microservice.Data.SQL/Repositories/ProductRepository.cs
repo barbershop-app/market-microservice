@@ -1,5 +1,6 @@
 ﻿using microservice.Core.IRepositories;
 using microservice.Infrastructure.Entities.DB;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +21,12 @@ namespace microservice.Data.SQL.Repositories
             return _context.Products.Where(s => s.Id == id).FirstOrDefault();
         }
 
-        public IEnumerable<Product> GetAllAsQueryable()
+        public IEnumerable<Product> GetAllAsQueryable(bool track)
         {
-            return _context.Products.AsQueryable();
+            if (track)
+                return _context.Products.AsQueryable();
+
+            return _context.Products.AsQueryable().AsNoTracking();
         }
     }
 }

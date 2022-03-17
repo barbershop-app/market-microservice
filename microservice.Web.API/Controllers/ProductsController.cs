@@ -24,55 +24,66 @@ namespace microservice.Web.API.Controllers
 
         [HttpGet]
         [Route("GetAllProducts")]
-        public IActionResult GetAllCartItems()
+        public IActionResult GetAllProducts()
         {
-            var products = _productService.GetAllAsQueryable().ToList();
-            if (products != null)
-                return Ok(products);
-            else
-                return BadRequest("Empty products.");
+            var products = _productService.GetAllAsQueryable(false);
+
+            return Ok(products);
         }
 
         [HttpGet]
-        [Route("GetProductById/{Id}")]
-        public IActionResult GetProductById(Guid Id)
+        [Route("GetAllProductByCategoryId/{Id}")]
+        public IActionResult GetAllProductByCategoryId(int id)
         {
-            var products = _productService.GetById(Id);
-            if (products != null)
-                return Ok(products);
-            else
-                return BadRequest("product not found.");
+            var products = _productService.GetAllAsQueryable(false).Where(x => x.CategoryId == id);
+
+            var response = new List<object>();
+
+            foreach (var product in products)
+            {
+                response.Add(new
+                {
+                    id = product.Id,
+                    name = product.Name,
+                    price = product.Price,
+                    isAvailable = product.IsAvailable,
+                    imageSource = product.ImageSource
+                });
+            }
+
+            return Ok(new
+            {
+                categoryId = id,
+                products = response
+            });
+
         }
 
         [HttpPost]
         [Route("CreateProduct")]
-        public IActionResult CreateCartItem([FromBody] ProductDTOs.Create dto)
+        public IActionResult CreateProduct([FromBody] ProductDTOs.Create dto)
         {
             try
             {
-                bool res = true;
-                var products = _productService.GetAllAsQueryable();
-                foreach (Product product in products)
-                {
-                    if (product.Name == dto.Name)
-                    {
-                        res = false;
-                        break;
-                    }
-                }
+                var product = _productService.GetAllAsQueryable(false).Where(x => x.Name == dto.Name).FirstOrDefault();
+
+                if (product != null)
+                    return BadRequest("Product with similiar name already exists.");
+
+                 product = _mapper.Map<Product>(dto);
+
+                var res = _productService.Create(product);
+
                 if (res)
-                {
-                    var product = _mapper.Map<Product>(dto);
+                    return Ok("Product has been created.");
 
-                    _productService.Create(product);
-                    return Ok("Product has been added.");
-                }
 
-                return BadRequest("Failed to create new product.");
+                return BadRequest(new { message = "Failed to create new product." });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest("Failed to create new product.");
+                _logger.LogError(ex.ToString());
+                return BadRequest(new { message = "Something went wrong." });
             }
 
         }
@@ -83,35 +94,52 @@ namespace microservice.Web.API.Controllers
         {
             try
             {
-                bool res = false;
-                var products = _productService.GetAllAsQueryable();
-                Product oldProduct = new Product();
-                foreach (Product product in products)
-                {
-                    if (product.Name == dto.Name)
-                    {
-                        res = true;
-                        oldProduct = _productService.GetById(product.Id);
-                        break;
-                    }
-                }
+                var oldProduct = _productService.GetById(dto.Id);
+
+                if (oldProduct == null)
+                    return BadRequest("Product does not exist.");
+
+                var product = _mapper.Map<Product>(dto);
+
+                var res = _productService.Update(oldProduct, product);
+
                 if (res)
-                {
-                    var product = _mapper.Map<Product>(dto);
-                    _productService.Edit(oldProduct, product);
-                    return Ok("Product has been updated.");
-                }
+                    return Ok(new { message = "Product has been updated."});
 
 
-
-                return BadRequest("Failed to update the Product.");
+                return BadRequest(new { message = "Failed to update the Product." });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest("Failed to update the Product.");
+                _logger.LogError(ex.ToString());
+                return BadRequest(new { message = "Something went wrong." });
             }
-
         }
 
+        [HttpDelete]
+        [Route("DeleteProduct/{id}")]
+        public IActionResult DeleteProduct(Guid id)
+        {
+            try
+            {
+                var product = _productService.GetById(id);
+
+                if (product == null)
+                    return BadRequest("Product does not exist.");
+
+                var res = _productService.Delete(product);
+
+                if (res)
+                    return Ok(new { message = "Product has been deleted." });
+
+
+                return BadRequest(new { message = "Failed to delete the Product." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return BadRequest(new { message = "Something went wrong." });
+            }
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace microservice.Core.IRepositories
 {
     public interface ICartItemRepository : IRepository<CartItem>
     {
-        IEnumerable<CartItem> GetAllAsQueryable();
+        IEnumerable<CartItem> GetAllAsQueryable(bool track);
         CartItem GetByIdIncluded(Guid id);
     }
 }

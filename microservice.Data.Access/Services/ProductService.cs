@@ -20,9 +20,9 @@ namespace microservice.Data.Access.Services
         {
             return _unitOfWork.Products.GetByIdIncluded(Id);
         }
-        public IEnumerable<Product> GetAllAsQueryable()
+        public IEnumerable<Product> GetAllAsQueryable(bool track)
         {
-            return _unitOfWork.Products.GetAllAsQueryable();
+            return _unitOfWork.Products.GetAllAsQueryable(track);
         }
 
 
@@ -38,11 +38,12 @@ namespace microservice.Data.Access.Services
             return _unitOfWork.Commit() > 0;
         }
 
-        public bool Edit(Product oldProduct, Product newProduct)
+        public bool Update(Product oldProduct, Product newProduct)
         {
             oldProduct.CategoryId = newProduct.CategoryId;
             oldProduct.Name = newProduct.Name;
             oldProduct.Price = newProduct.Price;
+
             if(newProduct.ImageSource != null)
              oldProduct.ImageSource = newProduct.ImageSource;
 

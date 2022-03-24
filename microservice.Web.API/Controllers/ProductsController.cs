@@ -32,8 +32,8 @@ namespace microservice.Web.API.Controllers
         }
 
         [HttpGet]
-        [Route("GetAllProductByCategoryId/{Id}")]
-        public IActionResult GetAllProductByCategoryId(int id)
+        [Route("GetAllProductsByCategoryId/{id}")]
+        public IActionResult GetAllProductsByCategoryId(int id)
         {
             var products = _productService.GetAllAsQueryable(false).Where(x => x.CategoryId == id);
 
@@ -116,7 +116,7 @@ namespace microservice.Web.API.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpPost]
         [Route("DeleteProduct/{id}")]
         public IActionResult DeleteProduct(Guid id)
         {

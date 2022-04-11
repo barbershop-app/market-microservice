@@ -28,7 +28,21 @@ namespace microservice.Web.API.Controllers
         {
             var products = _productService.GetAllAsQueryable(false);
 
-            return Ok(products);
+            var response = new List<object>();
+
+            foreach (var product in products)
+            {
+                response.Add(new
+                {
+                    id = product.Id,
+                    name = product.Name,
+                    price = product.Price,
+                    isAvailable = product.IsAvailable,
+                    imageSource = product.ImageSource
+                });
+            }
+
+            return Ok(new {products = response });
         }
 
         [HttpGet]
@@ -68,14 +82,14 @@ namespace microservice.Web.API.Controllers
                 var product = _productService.GetAllAsQueryable(false).Where(x => x.Name == dto.Name).FirstOrDefault();
 
                 if (product != null)
-                    return BadRequest("Product with similiar name already exists.");
+                    return BadRequest(new { message = "Product with similiar name already exists." });
 
                  product = _mapper.Map<Product>(dto);
 
                 var res = _productService.Create(product);
 
                 if (res)
-                    return Ok("Product has been created.");
+                    return Ok(new { message = "Product has been created." });
 
 
                 return BadRequest(new { message = "Failed to create new product." });
@@ -125,7 +139,7 @@ namespace microservice.Web.API.Controllers
                 var product = _productService.GetById(id);
 
                 if (product == null)
-                    return BadRequest("Product does not exist.");
+                    return BadRequest(new { message = "Product does not exist." });
 
                 var res = _productService.Delete(product);
 

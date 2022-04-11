@@ -13,13 +13,15 @@ namespace microservice.Web.API.Controllers
     {
         readonly IMapper _mapper;
         readonly ILogger<CategoriesController> _logger;
-        private readonly ICategoryService _categoryService;
+        readonly ICategoryService _categoryService;
+        readonly IProductService _productService;
 
-        public CategoriesController(IMapper mapper, ILogger<CategoriesController> logger, ICategoryService categoryService)
+        public CategoriesController(IMapper mapper, ILogger<CategoriesController> logger, ICategoryService categoryService, IProductService productService)
         {
             _mapper = mapper;
             _logger = logger;
             _categoryService = categoryService;
+            _productService = productService;
         }
 
         [HttpGet]
@@ -30,7 +32,20 @@ namespace microservice.Web.API.Controllers
             {
                 var categories = _categoryService.GetAllAsQueryable(false);
 
-                return Ok(categories);
+                var response = new List<object>();
+
+                foreach(var category in categories)
+                {
+                    var numberOfProductsInCategory = _productService.GetAllAsQueryable(false).Where(x => x.CategoryId == category.Id).Count();
+                    response.Add(new
+                    {
+                        id = category.Id,
+                        name = category.Name,
+                        numberOfProductsInCategory = numberOfProductsInCategory
+                    });
+                }
+
+                return Ok(new {categories = response});
             }
             catch (Exception ex)
             {

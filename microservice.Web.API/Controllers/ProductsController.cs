@@ -35,10 +35,15 @@ namespace microservice.Web.API.Controllers
                 response.Add(new
                 {
                     id = product.Id,
+                    categoryId = product.CategoryId,
                     name = product.Name,
+                    descreption = product.Descreption,
                     price = product.Price,
                     isAvailable = product.IsAvailable,
-                    imageSource = product.ImageSource
+                    onSale = product.OnSale,
+                    onSalePercentage = product.OnSalePercentage,
+                    imageSource = product.ImageSource,
+
                 });
             }
 
@@ -59,8 +64,11 @@ namespace microservice.Web.API.Controllers
                 {
                     id = product.Id,
                     name = product.Name,
+                    descreption = product.Descreption,
                     price = product.Price,
                     isAvailable = product.IsAvailable,
+                    onSale = product.OnSale,
+                    onSalePercentage = product.OnSalePercentage,
                     imageSource = product.ImageSource
                 });
             }

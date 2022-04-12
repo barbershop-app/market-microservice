@@ -30,17 +30,18 @@ namespace microservice.Web.API.Controllers
         {
             try
             {
-                var categories = _categoryService.GetAllAsQueryable(false);
+                var categories = _categoryService.GetAllAsQueryable(false).ToList();
 
                 var response = new List<object>();
 
                 foreach(var category in categories)
                 {
-                    var numberOfProductsInCategory = _productService.GetAllAsQueryable(false).Where(x => x.CategoryId == category.Id).Count();
+                    var numberOfProductsInCategory = _productService.GetAllAsQueryable(false).Where(x => x.CategoryId == category.Id)?.Count();
                     response.Add(new
                     {
                         id = category.Id,
                         name = category.Name,
+                        imageSource = category.ImageSource,
                         numberOfProductsInCategory = numberOfProductsInCategory
                     });
                 }
@@ -62,7 +63,12 @@ namespace microservice.Web.API.Controllers
             var category = _categoryService.GetById(id);
 
             if (category != null)
-                return Ok(category);
+                return Ok(new
+                {
+                    id = category.Id,
+                    name = category.Name,
+                    imageSource = category.ImageSource
+                });
 
             return BadRequest(new { message = "Category not found" });
         }
@@ -83,7 +89,7 @@ namespace microservice.Web.API.Controllers
                 var res = _categoryService.Create(category);
 
                 if (res)
-                    return Ok(new { message = "Category has been added." });
+                    return Ok(new { message = "Category has been added.", categoryId = category.Id });
 
                 return BadRequest(new { message = "Failed to create a new category." });
             }

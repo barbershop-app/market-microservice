@@ -14,6 +14,7 @@ namespace microservice.Infrastructure.Entities.DB
         [ForeignKey("Category")]
         public int CategoryId { get; set; }
         public string Name { get; set; }
+        public string Descreption { get; set; }
         public double Price { get; set; }
         public bool IsAvailable { get; set; }
         public bool OnSale { get; set; }
